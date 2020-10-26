@@ -19,5 +19,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 Route::get('/mpesa/password','MpesaController@lipaNaMpesaPassword');
 Route::post('/mpesa/new/access/token','MpesaController@newAccessToken');
+Route::post('/mpesa/stk/push','MpesaController@stkPush');
 
 
