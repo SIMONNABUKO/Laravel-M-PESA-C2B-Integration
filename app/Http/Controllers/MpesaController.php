@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use App\MpesaTransaction;
 
 class MpesaController extends Controller
 {
@@ -47,19 +48,31 @@ class MpesaController extends Controller
 
 
 
-    public function stkPush()
+    public function stkPush(Request $request)
     {  
+      
+            $user = $request->user;
+            $amount = $request->amount;
+            $phone =  $request->phone;
+            $formatedPhone = substr($phone, 1);//726582228
+            $code = "254";
+            $phoneNumber = $code.$formatedPhone;//254726582228
+
+      
+       
+
+
         $url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
         $curl_post_data = [
             'BusinessShortCode' =>174379,
             'Password' => $this->lipaNaMpesaPassword(),
             'Timestamp' => Carbon::rawParse('now')->format('YmdHms'),
             'TransactionType' => 'CustomerPayBillOnline',
-            'Amount' => '5',
-            'PartyA' => '254726582228', 
+            'Amount' => $amount,
+            'PartyA' => $phoneNumber, 
             'PartyB' => 174379,
-            'PhoneNumber' => '254726582228', 
-            'CallBackURL' => 'http://simontechschool.com/stk/push/callback/url',
+            'PhoneNumber' => $phoneNumber, 
+            'CallBackURL' => 'https://7db63514dbd1.ngrok.io/api/stk/push/callback/url',
             'AccountReference' => "Simon's Tech School Payment",
             'TransactionDesc' => "lipa Na M-PESA"
         ];
@@ -75,10 +88,28 @@ class MpesaController extends Controller
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
         $curl_response = curl_exec($curl);
-        return $curl_response; 
+        return redirect('/confirm'); 
+
+        
+        
      }  
+
+     public function MpesaRes(Request $request)
+     {
+        $response = json_decode($request->getContent());
+
+        $trn = new MpesaTransaction;
+        $trn->response = json_encode($response);
+        $trn->save();
+     }
+
+     public function confirm(){
+         //Compare the codes here
+         //If the codes are equal, validate the pay
+         //If the TransactionIds are not equal, do something
+     }
     }
 
 
-
+    
     

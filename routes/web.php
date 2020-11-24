@@ -16,3 +16,15 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/pay', function () {
+    return view('pay');
+});
+Route::get('/confirm', function () {
+    return view('confirm');
+});
+Route::post('/confirm', 'MpesaController@confirm')->name('confirm');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
